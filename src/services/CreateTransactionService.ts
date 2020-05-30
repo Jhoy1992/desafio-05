@@ -15,11 +15,15 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Request): Transaction {
-    if (type === 'outcome') {
-      const balance = this.transactionsRepository.getBalance();
+    if (!['income', 'outcome'].includes(type)) {
+      throw new Error('Transaction type is invalid');
+    }
 
-      if (balance.total < value) {
-        throw Error('Outcome value cannot be more than total available');
+    if (type === 'outcome') {
+      const { total } = this.transactionsRepository.getBalance();
+
+      if (total < value) {
+        throw new Error('Outcome value cannot be more than total available');
       }
     }
 
